@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MyTracker — BTech Life</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0a0a0f;
+  --surface:#13131c;
+  --surface2:#1c1c28;
+  --border:#2a2a3d;
+  --accent:#6c63ff;
+  --accent2:#ff6b9d;
+  --accent3:#00d4aa;
+  --text:#f0f0f8;
+  --muted:#7a7a9a;
+  --warn:#ffb347;
+  --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+/* BG grid pattern */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(108,99,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(108,99,255,0.03) 1px,transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;z-index:0;
+}
+.app{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:0 16px 60px}
+
+/* HEADER */
+header{
+  padding:28px 0 0;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+  margin-bottom:24px;
+}
+.logo{
+  font-family:'Syne',sans-serif;
+  font-weight:800;font-size:22px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.header-right{display:flex;align-items:center;gap:12px;padding-bottom:16px}
+.streak-chip{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:100px;padding:6px 14px;
+  font-size:13px;font-weight:500;color:var(--warn);
+}
+.date-chip{font-size:13px;color:var(--muted)}
+
+/* TABS */
+.tabs{
+  display:flex;gap:4px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:5px;margin-bottom:24px;
+}
+.tab-btn{
+  flex:1;padding:9px 8px;
+  border:none;background:none;
+  color:var(--muted);font-size:13px;font-weight:500;
+  border-radius:10px;cursor:pointer;
+  transition:all .2s;font-family:'DM Sans',sans-serif;
+}
+.tab-btn.active{
+  background:var(--accent);color:#fff;
+  box-shadow:0 0 20px rgba(108,99,255,0.4);
+}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* CARDS */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;margin-bottom:16px;
+  position:relative;overflow:hidden;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  opacity:0;transition:.3s;
+}
+.card:hover::before{opacity:1}
+.card-title{
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:15px;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+
+/* METRICS */
+.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.metric-box{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px;text-align:center;
+}
+.metric-val{font-family:'Space Mono',monospace;font-size:26px;font-weight:700;line-height:1}
+.metric-lbl{font-size:11px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.5px}
+
+/* TASKS */
+.task-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:12px 0;border-bottom:1px solid var(--border);
+}
+.task-item:last-child{border-bottom:none}
+.task-cb{
+  width:22px;height:22px;border-radius:6px;
+  border:2px solid var(--border);
+  background:none;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;margin-top:1px;
+}
+.task-cb.done{background:var(--accent3);border-color:var(--accent3)}
+.task-cb.done::after{content:'✓';color:#000;font-size:13px;font-weight:700}
+.task-body{flex:1;min-width:0}
+.task-text{font-size:14px;line-height:1.5;color:var(--text);transition:.2s}
+.task-text.done{text-decoration:line-through;color:var(--muted)}
+.task-meta{display:flex;gap:8px;margin-top:5px;flex-wrap:wrap}
+.pill{
+  font-size:11px;padding:2px 10px;border-radius:100px;font-weight:500;
+}
+.pill-purple{background:rgba(108,99,255,.2);color:#9b94ff}
+.pill-teal{background:rgba(0,212,170,.15);color:#00d4aa}
+.pill-pink{background:rgba(255,107,157,.15);color:#ff6b9d}
+.pill-amber{background:rgba(255,179,71,.15);color:#ffb347}
+.pill-blue{background:rgba(64,156,255,.15);color:#409cff}
+.pill-green{background:rgba(100,200,100,.15);color:#64c864}
+
+/* FORM ELEMENTS */
+label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;margin-top:14px;text-transform:uppercase;letter-spacing:.5px}
+input,textarea,select{
+  width:100%;padding:11px 14px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:10px;color:var(--text);
+  font-size:14px;font-family:'DM Sans',sans-serif;
+  outline:none;transition:border .2s;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:80px}
+select option{background:var(--surface2)}
+
+/* STARS */
+.stars{display:flex;gap:4px;margin-top:8px}
+.star{font-size:24px;cursor:pointer;color:var(--border);transition:.1s;line-height:1}
+.star.on{color:var(--warn)}
+
+/* BUTTONS */
+.btn{
+  padding:10px 20px;border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--surface2);color:var(--text);
+  font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;
+  cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;
+}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn-accent{
+  background:linear-gradient(135deg,var(--accent),#8a63ff);
+  border:none;color:#fff;
+  box-shadow:0 0 20px rgba(108,99,255,.35);
+}
+.btn-accent:hover{transform:translateY(-1px);box-shadow:0 4px 24px rgba(108,99,255,.5);color:#fff}
+.btn-full{width:100%;justify-content:center}
+.btn-sm{padding:7px 14px;font-size:13px}
+
+/* AREA BARS */
+.area-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.area-row:last-child{border-bottom:none}
+.area-name{font-size:13px;min-width:120px;color:var(--text)}
+.area-bar-wrap{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.area-bar-fill{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.area-pct{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);min-width:42px;text-align:right}
+
+/* AI BOX */
+.ai-output{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:10px;padding:16px;
+  font-size:14px;line-height:1.8;color:var(--text);
+  min-height:100px;white-space:pre-wrap;word-break:break-word;
+}
+.ai-placeholder{color:var(--muted);font-style:italic;font-size:13px}
+
+/* SCORE RING */
+.score-section{text-align:center;padding:16px 0 8px}
+.score-num{
+  font-family:'Space Mono',monospace;font-size:64px;font-weight:700;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1;
+}
+.score-sub{font-size:13px;color:var(--muted);margin-top:6px}
+
+/* EMPTY STATE */
+.empty{
+  text-align:center;padding:32px 16px;
+  color:var(--muted);font-size:14px;
+}
+.empty-icon{font-size:36px;margin-bottom:10px}
+
+/* LOG ENTRY */
+.log-entry{
+  padding:12px 0;border-bottom:1px solid var(--border);
+}
+.log-entry:last-child{border-bottom:none}
+.log-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.log-desc{font-size:14px;color:var(--text);flex:1;line-height:1.5}
+.log-date{font-size:11px;color:var(--muted);white-space:nowrap;font-family:'Space Mono',monospace}
+.log-meta{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center}
+.stars-small{color:var(--warn);font-size:13px}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  background:var(--surface2);border:1px solid var(--accent);
+  border-radius:10px;padding:12px 20px;
+  font-size:14px;color:var(--text);
+  transform:translateY(80px);opacity:0;
+  transition:all .3s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 0 30px rgba(108,99,255,.3);
+}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* LOADING DOTS */
+.loading-dots::after{
+  content:'';animation:dots 1.2s steps(4,end) infinite;
+}
+@keyframes dots{
+  0%,20%{content:''}25%,45%{content:'.'}50%,70%{content:'..'}75%,100%{content:'...'}
+}
+
+/* RESPONSIVE */
+@media(max-width:500px){
+  .metrics-grid{grid-template-columns:repeat(3,1fr)}
+  .metric-val{font-size:20px}
+  .score-num{font-size:48px}
+  .tabs{gap:2px}
+  .tab-btn{font-size:12px;padding:8px 4px}
+}
+
+/* WATERMARK */
+.made-by{
+  text-align:center;font-size:12px;color:var(--muted);
+  margin-top:40px;padding-top:20px;border-top:1px solid var(--border);
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">⚡ MyTracker</div>
+    <div class="header-right">
+      <div class="streak-chip" id="streak-chip">🔥 0 days</div>
+      <div class="date-chip" id="date-chip"></div>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('today')">📅 Aaj</button>
+    <button class="tab-btn" onclick="switchTab('log')">✏️ Log</button>
+    <button class="tab-btn" onclick="switchTab('history')">📖 History</button>
+    <button class="tab-btn" onclick="switchTab('monthly')">📊 Monthly</button>
+  </div>
+
+  <!-- ===== TODAY ===== -->
+  <div id="tab-today" class="tab-content active">
+    <div class="metrics-grid">
+      <div class="metric-box">
+        <div class="metric-val" id="m-score" style="color:var(--accent)">—</div>
+        <div class="metric-lbl">Aaj Score</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-val" id="m-done" style="color:var(--accent3)">0/0</div>
+        <div class="metric-lbl">Tasks Done</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-val" id="m-time" style="color:var(--accent2)">0m</div>
+        <div class="metric-lbl">Time Today</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        🤖 AI Daily Tasks
+        <button class="btn btn-sm btn-accent" style="margin-left:auto" onclick="generateTasks()" id="gen-btn">✨ Generate</button>
+      </div>
+      <div id="tasks-list">
+        <div class="empty">
+          <div class="empty-icon">🎯</div>
+          Generate button dabao — AI tumhare BTech CS goals ke according aaj ke personalized tasks banayega.
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💬 Quick Daily Note</div>
+      <textarea id="quick-note" placeholder="Aaj kuch extra kiya? Notes likhо..."></textarea>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap">
+        <span style="font-size:13px;color:var(--muted)">Mood:</span>
+        <div class="stars" id="mood-stars">
+          <span class="star" onclick="setMood(1)">★</span>
+          <span class="star" onclick="setMood(2)">★</span>
+          <span class="star" onclick="setMood(3)">★</span>
+          <span class="star" onclick="setMood(4)">★</span>
+          <span class="star" onclick="setMood(5)">★</span>
+        </div>
+        <span id="mood-txt" style="font-size:13px;color:var(--muted)"></span>
+      </div>
+      <div style="margin-top:12px">
+        <button class="btn btn-accent" onclick="saveDayNote()">💾 Note Save Karo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LOG ===== -->
+  <div id="tab-log" class="tab-content">
+    <div class="card">
+      <div class="card-title">📝 Activity Log Karo</div>
+
+      <label>Category</label>
+      <select id="log-cat">
+        <option value="coding">💻 Coding / Web Dev (HTML, CSS, JS)</option>
+        <option value="dsa">🧩 DSA / Problem Solving</option>
+        <option value="academics">📚 Academics — Maths / Physics</option>
+        <option value="communication">🗣️ Communication / English Speaking</option>
+        <option value="devops">⚙️ DevOps / Linux / Automation</option>
+        <option value="gate">🎯 GATE Prep</option>
+        <option value="project">🚀 Personal Project</option>
+        <option value="cs-theory">🖥️ CS Theory (OS, CN, DBMS)</option>
+        <option value="other">📝 Kuch Aur</option>
+      </select>
+
+      <label>Kya kiya? (detail mein)</label>
+      <textarea id="log-desc" placeholder="e.g. CSS flexbox complete kiya, 3 layout banaye. JS variables aur data types padhе..."></textarea>
+
+      <label>Time diya</label>
+      <select id="log-time">
+        <option value="15">15 minutes</option>
+        <option value="30">30 minutes</option>
+        <option value="45">45 minutes</option>
+        <option value="60" selected>1 ghanta</option>
+        <option value="90">1.5 ghante</option>
+        <option value="120">2 ghante</option>
+        <option value="180">3 ghante</option>
+        <option value="240">4+ ghante</option>
+      </select>
+
+      <label>Apni performance rate karo (1-5 stars)</label>
+      <div class="stars" id="log-stars">
+        <span class="star" onclick="setLogRating(1)">★</span>
+        <span class="star" onclick="setLogRating(2)">★</span>
+        <span class="star" onclick="setLogRating(3)">★</span>
+        <span class="star" onclick="setLogRating(4)">★</span>
+        <span class="star" onclick="setLogRating(5)">★</span>
+      </div>
+      <div id="rating-hint" style="font-size:13px;color:var(--muted);margin-top:8px">Rating select karo</div>
+
+      <div style="margin-top:18px">
+        <button class="btn btn-accent btn-full" onclick="saveLog()">✅ Log Save Karo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HISTORY ===== -->
+  <div id="tab-history" class="tab-content">
+    <div class="card">
+      <div class="card-title">📖 Pichli Logs</div>
+      <div id="history-list">
+        <div class="empty"><div class="empty-icon">📭</div>Abhi koi logs nahi hain.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MONTHLY ===== -->
+  <div id="tab-monthly" class="tab-content">
+    <div class="metrics-grid">
+      <div class="metric-box">
+        <div class="metric-val" id="mm-days" style="color:var(--accent3)">0</div>
+        <div class="metric-lbl">Active Days</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-val" id="mm-sessions" style="color:var(--accent)">0</div>
+        <div class="metric-lbl">Sessions</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-val" id="mm-hours" style="color:var(--accent2)">0h</div>
+        <div class="metric-lbl">Total Time</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Area-wise Breakdown</div>
+      <div id="area-breakdown">
+        <div class="empty"><div class="empty-icon">📉</div>Pehle kuch logs daalo.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="score-section">
+        <div class="score-num" id="month-score">—</div>
+        <div class="score-sub">Month Score /100</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        🤖 AI Monthly Analysis
+        <button class="btn btn-sm btn-accent" style="margin-left:auto" onclick="getMonthlyAnalysis()" id="monthly-btn">🔍 Analyze Karo</button>
+      </div>
+      <div class="ai-output" id="monthly-ai">
+        <span class="ai-placeholder">Analyze button dabao — AI tumhara poora mahine ka honest analysis karega, score dega, aur batayega ki kahan kaam karna hai.</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="margin-bottom:4px">⚠️ Data Reset</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Sab data delete ho jayega. Careful!</p>
+      <button class="btn" onclick="resetData()" style="color:var(--accent2);border-color:var(--accent2)">🗑️ Reset All Data</button>
+    </div>
+  </div>
+
+  <div class="made-by">Made with ⚡ for BTech grind</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ STATE ============
+const CATS = {
+  coding:{label:'💻 Coding',color:'#6c63ff',pill:'pill-purple'},
+  dsa:{label:'🧩 DSA',color:'#00d4aa',pill:'pill-teal'},
+  academics:{label:'📚 Academics',color:'#ffb347',pill:'pill-amber'},
+  communication:{label:'🗣️ Communication',color:'#ff6b9d',pill:'pill-pink'},
+  devops:{label:'⚙️ DevOps',color:'#409cff',pill:'pill-blue'},
+  gate:{label:'🎯 GATE',color:'#64c864',pill:'pill-green'},
+  project:{label:'🚀 Project',color:'#ff6b9d',pill:'pill-pink'},
+  'cs-theory':{label:'🖥️ CS Theory',color:'#9b94ff',pill:'pill-purple'},
+  other:{label:'📝 Other',color:'#7a7a9a',pill:''}
+};
+
+const MOOD_LABELS = ['','😔 Bad','😐 Okay','🙂 Good','😊 Great','🔥 Lit!'];
+const RATING_LABELS = ['','Kuch nahi hua 😔','Thoda kiya 😐','Theek tha 🙂','Acha tha 😊','Bahut badhiya! 🔥'];
+
+let state = {logs:[],tasks:[],tasksDone:[],streak:0,lastDate:'',mood:0,logRating:0,notes:{}};
+
+function loadState(){
+  try{const s=localStorage.getItem('mytracker_v3');if(s)state=JSON.parse(s);}catch(e){}
+}
+function saveState(){
+  try{localStorage.setItem('mytracker_v3',JSON.stringify(state));}catch(e){}
+}
+loadState();
+
+// ============ HELPERS ============
+function today(){ return new Date().toISOString().slice(0,10); }
+function todayLogs(){ return state.logs.filter(l=>l.date===today()); }
+function monthLogs(){
+  const m=today().slice(0,7);
+  return state.logs.filter(l=>l.date.startsWith(m));
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function updateStreak(){
+  const t=today();
+  const hasLog=state.logs.some(l=>l.date===t);
+  if(!hasLog)return;
+  if(state.lastDate===t)return;
+  const yd=new Date();yd.setDate(yd.getDate()-1);
+  const yds=yd.toISOString().slice(0,10);
+  if(state.lastDate===yds||state.streak===0)state.streak++;
+  else if(state.lastDate!==t)state.streak=1;
+  state.lastDate=t;
+}
+
+// ============ HEADER ============
+function renderHeader(){
+  document.getElementById('streak-chip').textContent='🔥 '+state.streak+' days';
+  const d=new Date();
+  document.getElementById('date-chip').textContent=d.toLocaleDateString('hi-IN',{weekday:'short',day:'numeric',month:'short'});
+}
+
+// ============ TABS ============
+function switchTab(id){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+    b.classList.toggle('active',['today','log','history','monthly'][i]===id);
+  });
+  document.querySelectorAll('.tab-content').forEach(s=>s.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if(id==='today')renderTodayMetrics(),renderTasks();
+  if(id==='history')renderHistory();
+  if(id==='monthly')renderMonthly();
+}
+
+// ============ MOOD ============
+function setMood(n){
+  state.mood=n;
+  document.querySelectorAll('#mood-stars .star').forEach((s,i)=>s.classList.toggle('on',i<n));
+  document.getElementById('mood-txt').textContent=MOOD_LABELS[n]||'';
+}
+
+// ============ LOG RATING ============
+function setLogRating(n){
+  state.logRating=n;
+  document.querySelectorAll('#log-stars .star').forEach((s,i)=>s.classList.toggle('on',i<n));
+  document.getElementById('rating-hint').textContent=RATING_LABELS[n]||'';
+}
+
+// ============ TODAY METRICS ============
+function renderTodayMetrics(){
+  const logs=todayLogs();
+  const avgR=logs.length?Math.round(logs.reduce((a,l)=>a+l.rating,0)/logs.length*20):null;
+  document.getElementById('m-score').textContent=avgR!==null?avgR+'%':'—';
+  const done=state.tasksDone.filter(d=>d.date===today()).length;
+  const total=state.tasks.filter(tk=>tk.date===today()).length;
+  document.getElementById('m-done').textContent=done+'/'+total;
+  const mins=logs.reduce((a,l)=>a+l.time,0);
+  document.getElementById('m-time').textContent=mins>=60?Math.floor(mins/60)+'h '+(mins%60)+'m':mins+'m';
+}
+
+// ============ GENERATE TASKS ============
+async function generateTasks(){
+  const btn=document.getElementById('gen-btn');
+  btn.disabled=true;btn.textContent='⏳...';
+  document.getElementById('tasks-list').innerHTML='<div class="empty"><div class="empty-icon">🤖</div><span class="loading-dots">AI soch raha hai</span></div>';
+
+  const t=today();
+  const recentLogs=state.logs.slice(-15).map(l=>`${l.category}: ${l.desc.slice(0,60)} (${l.time}min, ${l.rating}★)`).join('\n')||'No logs yet';
+  const doneLogs=state.tasksDone.filter(d=>d.date===t).length;
+
+  const prompt=`You are a strict tech mentor for an Indian BTech CS student.
+Student profile:
+- 2nd semester, going to 3rd sem
+- Goal: DevOps + full automation engineer, GATE 2026, paid internship by end of 2nd year
+- Skills done: HTML 100%, CSS 40%
+- Backlogs: Maths & Physics (need to clear in 3rd sem)
+- Weakness: communication & confidence
+- Recent activity:\n${recentLogs}
+
+Today is ${t}. Create 5 specific, actionable tasks. Cover a mix of: web dev (CSS/JS progress), DSA basics, academics backlog, communication practice, and one DevOps/automation concept.
+Each task should be industry-relevant and achievable in 30-90 mins.
+
+Respond ONLY as valid JSON array, no markdown, no extra text:
+[{"task":"task description in Hinglish","category":"coding|dsa|academics|communication|devops|gate|project|cs-theory","time":"45 min","priority":"high|medium|low","tip":"one sentence pro tip"}]`;
+
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    const d=await r.json();
+    const txt=d.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
+    const tasks=JSON.parse(txt);
+    state.tasks=state.tasks.filter(tk=>tk.date!==t);
+    tasks.forEach((tk,i)=>state.tasks.push({...tk,date:t,id:t+'_'+i}));
+    saveState();renderTasks();
+  }catch(e){
+    document.getElementById('tasks-list').innerHTML='<div class="empty">❌ Error aaya. Internet check karo aur dobara try karo.</div>';
+  }
+  btn.disabled=false;btn.textContent='✨ Generate';
+  renderTodayMetrics();
+}
+
+// ============ RENDER TASKS ============
+function renderTasks(){
+  const t=today();
+  const tasks=state.tasks.filter(tk=>tk.date===t);
+  const el=document.getElementById('tasks-list');
+  if(!tasks.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">🎯</div>Generate button dabao tasks ke liye.</div>';
+    return;
+  }
+  const pColors={high:'pill-pink',medium:'pill-amber',low:'pill-teal'};
+  el.innerHTML=tasks.map(tk=>{
+    const done=state.tasksDone.some(d=>d.id===tk.id&&d.date===t);
+    const cat=CATS[tk.category]||{label:tk.category,pill:''};
+    return `<div class="task-item">
+      <div class="task-cb ${done?'done':''}" onclick="toggleTask('${tk.id}')"></div>
+      <div class="task-body">
+        <div class="task-text ${done?'done':''}">${tk.task}</div>
+        <div class="task-meta">
+          <span class="pill ${cat.pill}">${cat.label}</span>
+          <span class="pill" style="background:rgba(255,255,255,.06);color:var(--muted)">${tk.time}</span>
+          <span class="pill ${pColors[tk.priority]||'pill-teal'}">${tk.priority}</span>
+        </div>
+        ${tk.tip?`<div style="font-size:12px;color:var(--muted);margin-top:5px;font-style:italic">💡 ${tk.tip}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  renderTodayMetrics();
+}
+
+function toggleTask(id){
+  const t=today();
+  const idx=state.tasksDone.findIndex(d=>d.id===id&&d.date===t);
+  if(idx>=0)state.tasksDone.splice(idx,1);
+  else{state.tasksDone.push({id,date:t});showToast('✅ Task complete!');}
+  saveState();renderTasks();
+}
+
+// ============ SAVE NOTE ============
+function saveDayNote(){
+  const note=document.getElementById('quick-note').value.trim();
+  if(!note&&!state.mood)return showToast('Note ya mood zaroori hai!');
+  state.notes[today()]={note,mood:state.mood,time:Date.now()};
+  saveState();
+  showToast('📝 Note saved!');
+}
+
+// ============ SAVE LOG ============
+function saveLog(){
+  const cat=document.getElementById('log-cat').value;
+  const desc=document.getElementById('log-desc').value.trim();
+  const time=parseInt(document.getElementById('log-time').value);
+  const rating=state.logRating;
+  if(!desc)return showToast('⚠️ Kya kiya woh likhna zaroori hai!');
+  if(!rating)return showToast('⚠️ Rating bhi do!');
+  state.logs.push({id:Date.now(),date:today(),category:cat,desc,time,rating,mood:state.mood});
+  updateStreak();saveState();
+  // reset
+  document.getElementById('log-desc').value='';
+  document.getElementById('log-time').value='60';
+  state.logRating=0;
+  document.querySelectorAll('#log-stars .star').forEach(s=>s.classList.remove('on'));
+  document.getElementById('rating-hint').textContent='Rating select karo';
+  renderTodayMetrics();renderHeader();
+  showToast('✅ Log save ho gaya!');
+}
+
+// ============ HISTORY ============
+function renderHistory(){
+  const el=document.getElementById('history-list');
+  const logs=[...state.logs].reverse().slice(0,50);
+  if(!logs.length){el.innerHTML='<div class="empty"><div class="empty-icon">📭</div>Koi logs nahi hain.</div>';return;}
+  el.innerHTML=logs.map(l=>{
+    const cat=CATS[l.category]||{label:l.category,pill:''};
+    const stars='★'.repeat(l.rating)+'☆'.repeat(5-l.rating);
+    return `<div class="log-entry">
+      <div class="log-top">
+        <div class="log-desc">${l.desc.slice(0,120)}${l.desc.length>120?'...':''}</div>
+        <div class="log-date">${l.date}</div>
+      </div>
+      <div class="log-meta">
+        <span class="pill ${cat.pill}">${cat.label}</span>
+        <span class="pill" style="background:rgba(255,255,255,.06);color:var(--muted)">${l.time}m</span>
+        <span class="stars-small">${stars}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============ MONTHLY ============
+function renderMonthly(){
+  const logs=monthLogs();
+  const activeDays=new Set(logs.map(l=>l.date)).size;
+  document.getElementById('mm-days').textContent=activeDays;
+  document.getElementById('mm-sessions').textContent=logs.length;
+  const totalMins=logs.reduce((a,l)=>a+l.time,0);
+  document.getElementById('mm-hours').textContent=Math.round(totalMins/60)+'h';
+
+  // Area breakdown
+  const areaData={};
+  logs.forEach(l=>{
+    if(!areaData[l.category])areaData[l.category]={total:0,count:0,time:0};
+    areaData[l.category].total+=l.rating;
+    areaData[l.category].count++;
+    areaData[l.category].time+=l.time;
+  });
+  const el=document.getElementById('area-breakdown');
+  if(!Object.keys(areaData).length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">📉</div>Is mahine koi logs nahi.</div>';
+  } else {
+    const sorted=Object.entries(areaData).sort((a,b)=>b[1].time-a[1].time);
+    el.innerHTML=sorted.map(([cat,d])=>{
+      const avg=Math.round(d.total/d.count*20);
+      const catInfo=CATS[cat]||{label:cat,color:'#7a7a9a'};
+      return `<div class="area-row">
+        <div class="area-name">${catInfo.label}</div>
+        <div class="area-bar-wrap"><div class="area-bar-fill" style="width:${avg}%;background:${catInfo.color}"></div></div>
+        <div class="area-pct">${avg}%</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Month score
+  const avgAll=logs.length?Math.round(logs.reduce((a,l)=>a+l.rating,0)/logs.length*20):null;
+  const consistencyBonus=Math.min(20,activeDays*2);
+  const finalScore=avgAll!==null?Math.min(100,avgAll+consistencyBonus):null;
+  document.getElementById('month-score').textContent=finalScore!==null?finalScore:'—';
+}
+
+// ============ MONTHLY AI ANALYSIS ============
+async function getMonthlyAnalysis(){
+  const btn=document.getElementById('monthly-btn');
+  const box=document.getElementById('monthly-ai');
+  btn.disabled=true;btn.textContent='⏳ Analyzing...';
+  box.innerHTML='<span class="ai-placeholder loading-dots">AI data dekh raha hai</span>';
+
+  const logs=monthLogs();
+  if(!logs.length){
+    box.innerHTML='<span class="ai-placeholder">Is mahine koi logs nahi hain. Pehle kuch log karo.</span>';
+    btn.disabled=false;btn.textContent='🔍 Analyze Karo';return;
+  }
+
+  const areaData={};
+  logs.forEach(l=>{
+    if(!areaData[l.category])areaData[l.category]={total:0,count:0,time:0};
+    areaData[l.category].total+=l.rating;
+    areaData[l.category].count++;
+    areaData[l.category].time+=l.time;
+  });
+  const summary=Object.entries(areaData).map(([k,v])=>`${k}: avg ${(v.r/v.c||v.total/v.count).toFixed(1)}/5, ${v.count} sessions, ${v.time}min`).join('\n');
+  const activeDays=new Set(logs.map(l=>l.date)).size;
+
+  const prompt=`You are an honest, caring mentor for a BTech CS student in India.
+Student: 2nd sem, BTech CS → Goal: DevOps engineer, GATE 2026, paid internship
+Month: ${today().slice(0,7)} | Active days: ${activeDays} | Total sessions: ${logs.length}
+
+Area-wise performance:
+${summary}
+
+Give a monthly analysis report in Hinglish (Hindi+English mix). Be specific and honest. Format:
+
+📊 OVERALL SCORE: XX/100
+
+💪 STRONG AREAS:
+• ...
+• ...
+
+⚠️ WEAK AREAS — KAAM KARNA HAI:
+• ...
+• ...
+
+🎯 NEXT MONTH ACTION PLAN:
+• ...
+• ...
+• ...
+
+💬 MENTOR KI BAAT:
+(2-3 lines of honest, motivating message)
+
+Keep it real. Don't sugarcoat. Be specific about what needs improvement.`;
+
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:[{role:'user',content:prompt}]})
+    });
+    const d=await r.json();
+    box.textContent=d.content.map(c=>c.text||'').join('');
+  }catch(e){
+    box.innerHTML='<span class="ai-placeholder">❌ Error aaya. Internet check karo aur dobara try karo.</span>';
+  }
+  btn.disabled=false;btn.textContent='🔍 Analyze Karo';
+}
+
+// ============ RESET ============
+function resetData(){
+  if(!confirm('Sach mein sab data delete karna chahte ho? Yeh undo nahi hoga!'))return;
+  state={logs:[],tasks:[],tasksDone:[],streak:0,lastDate:'',mood:0,logRating:0,notes:{}};
+  saveState();location.reload();
+}
+
+// ============ INIT ============
+renderHeader();
+renderTodayMetrics();
+renderTasks();
+</script>
+</body>
+</html>
